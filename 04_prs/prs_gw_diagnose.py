@@ -1,17 +1,17 @@
 # %% PRS-G5 - why is the genome-wide score pointing the wrong way? (no Hail needed, runs in a minute or two)
-# Prints only variant-level public information and one aggregate number per chromosome - no individual scores.
+# essentially - this entire thing is looking at the PRS - it was not needed for the other analyses, exploratory info only
 import os, subprocess
 import numpy as np, pandas as pd
 
 P = "YOUR-WORKSPACE-ID"
-PRS_OUT = "gs://vpa-full-YOUR-WORKSPACE-ID/prs"
+PRS_OUT = "gs://YOUR-WORKSPACE-ID/prs"
 GW_OUT = f"{PRS_OUT}/pgs002288_by_chr"
 LOCAL_PGS = "/tmp/PGS002288_hmPOS_GRCh38.txt.gz"
 os.makedirs("/tmp/gw", exist_ok=True)
 
 # ---------------------------------------------------------------------------------------------
-# PART 1 - do the score's weights agree in sign with the published odds ratios at the 30 lead SNPs?
-# (The 30 lead SNPs are the ones the genome-wide score was built from, so they must agree.)
+# PART 1 - asking if the score's weights agree in sign with the published odds ratios at the 30 lead SNPs?
+
 LEAD = pd.DataFrame([
     ("rs3820282", 1, 22141722, "T", 0.86), ("rs9306894", 2, 20678345, "G", 1.10),
     ("rs11899888", 2, 55875609, "G", 1.11), ("rs3791675", 2, 55884174, "T", 0.92),
