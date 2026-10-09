@@ -2,7 +2,6 @@
 # Rare pathogenic variant analysis (Aim 2) - full re-run pipeline for a new workspace
 # Python notebook. Each "# %%" block is one notebook cell. Run them in order.
 #
-# Lessons from the September run are built in:
 #   - read every extracted file with dtype=str (the ClinVar star column silently became NaN once)
 #   - star rating = maximum across submitters (the field is comma-separated)
 #   - P/LP is judged per submitter call, so "clean" and "conflicting" are separated explicitly
@@ -12,7 +11,7 @@
 #   - every printed participant count of 1-19 is replaced with "<20", so output is safe to copy out
 # =====================================================================================
 
-# %% CELL 0a - recover workspace settings the kernel cannot see (run before anything else)
+# %% CELL 0a - recover workspace settings 
 import os, subprocess
 P = os.environ["GOOGLE_PROJECT"]
 
@@ -31,7 +30,7 @@ for k, val in found.items():
 os.environ.setdefault("WORKSPACE_CDR", "YOUR-CDR-PROJECT.C2025Q4R6")   # so Dataset Builder code also runs
 print("Recovered from the Jupyter server:", found or "nothing")
 
-# 2. If still missing, list where they could be
+# 2. If still missing, list where they could be - skip if found 
 def sh(cmd):
     r = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     print((r.stdout or r.stderr).strip()[:4000])
