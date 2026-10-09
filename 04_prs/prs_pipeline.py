@@ -1,5 +1,6 @@
 # %% PRS-1 - pull the 30 Pujol-Gualdo lead SNPs for every woman in the PRS cohorts (Hail)
-# Needs the same Hail (Dataproc) setup as VPA CELL 2. Saves one genotype file to the bucket.
+# Needs the same Hail (Dataproc) setup as the cell that built the PVA. Saves one genotype file to the bucket 
+# that way the big thing only has to run once and you can refer to it again. 
 import io, subprocess
 import pandas as pd
 import hail as hl
@@ -57,7 +58,7 @@ print("row key:", list(mt.row_key), "| column key:", list(mt.col_key), "| entry 
 assert "GT" in mt.entry, "no GT field"
 sample = list(mt.col_key)[0]
 
-# a 3-bp window round each position, so an indel anchored one base earlier is still caught
+# a 3-bp window round each position because this is genetics so there's errors and indels
 intervals = [hl.parse_locus_interval(f"chr{c}:{p - 1}-{p + 2}", reference_genome="GRCh38")
              for c, p in zip(SNPS["chrom"], SNPS["pos"])]
 mt = hl.filter_intervals(mt, intervals)
@@ -79,7 +80,7 @@ ent.export(f"{PRS_OUT}/genotypes_30snps.tsv.bgz")
 print("saved", f"{PRS_OUT}/genotypes_30snps.tsv.bgz")
 
 
-# %% PRS-2 - match each SNP to its effect allele, check the genotypes, and build the score
+# %% match each SNP to its effect allele, check the genotypes, and build the score
 import numpy as np
 LOCAL_G = "/tmp/genotypes_30snps.tsv.bgz"                       # /tmp, never the notebook folder
 subprocess.run(["gsutil", "-q", "cp", f"{PRS_OUT}/genotypes_30snps.tsv.bgz", LOCAL_G], check=True)
@@ -103,7 +104,7 @@ for s in SNPS.to_dict("records"):
 match = pd.DataFrame(match)
 assert match["variant"].notna().all(), f"unmatched: {match.loc[match['variant'].isna(), 'rsid'].tolist()}"
 
-# 2. read only the 30 chosen variants (missing genotypes come out of Hail as NA)
+# 2. read only the 30 chosen variants (missing genotypes come out of Hail as NA, ignore it) 
 keep = set(match["variant"])
 parts = []
 for ch in pd.read_csv(LOCAL_G, sep="\t", compression="gzip", dtype={"person_id": str, "variant": str},
@@ -112,7 +113,7 @@ for ch in pd.read_csv(LOCAL_G, sep="\t", compression="gzip", dtype={"person_id":
 g = pd.concat(parts).pivot(index="person_id", columns="variant", values="dosage").astype(float)
 print(f"genotype matrix: {g.shape[0]:,} women x {g.shape[1]} variants")
 
-# 3. dosage of the EFFECT allele, and checks per SNP (frequencies only - no participant counts)
+# 3. dosage of the EFFECT allele, and checks per SNP (frequencies only - no participant counts - if this is all of us, do not print participant counts)
 eff = pd.DataFrame(index=g.index)
 for m in match.itertuples():
     eff[m.rsid] = g[m.variant] if m.effect_is == "alt" else 2 - g[m.variant]
@@ -133,7 +134,7 @@ pd.set_option("display.width", 250)
 print(match.drop(columns=["variant"]).to_string(index=False))
 assert match["missing_pct"].max() < 5, "a SNP is missing in over 5% of women"
 
-# 4. weighted score: sum of log(OR) x effect-allele dosage; missing genotypes set to that SNP's mean
+# 4. weighted score: sum of log(OR) x effect-allele dosage --- missing genotypes set to that SNP's mean
 w = np.log(match.set_index("rsid")["or"])
 filled = eff.fillna(eff.mean())
 prs = pd.DataFrame({"person_id": eff.index, "prs_raw": filled[w.index].values @ w.values,
