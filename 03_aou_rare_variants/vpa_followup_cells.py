@@ -1,10 +1,11 @@
 # =====================================================================================
 # Follow-up analyses for Aim 2. Run after vpa_pipeline.py (needs v, QUAL, IDS, carriers,
-# PANELS, MECHANISMS, COL, or_ci and save in memory). Each '# %%' block is one notebook cell.
+# PANELS, MECHANISMS, COL, or_ci and save in memory). Each '# %%' block was one notebook cell.
+# Testing every single thing I can think of basically
 # =====================================================================================
 
-# %% CELL 11 - variants driving the comparison-group carrier rate
-# DIAGNOSTIC - which variants drive the comparison-group carrier rate? (output safe to export: <20 suppressed)
+# %% CELL 11 - which variants are driving the comparison-group carrier rate
+# diagnostic essentially (<20 suppressed)
 q = QUAL["Primary (coding, >=1*)"]
 q147 = q[q["gene"].isin(PANELS["Wide-147 (original)"])]
 c = carriers[carriers["vid"].isin(set(q147["vid"]))]
@@ -52,7 +53,7 @@ pd.set_option("display.width", 250, "display.max_rows", 200)
 print(mt[["definition", "mechanism", "comparison", "cases %", "comp %", "OR (95% CI)", "p", "q (BH)"]].to_string(index=False))
 
 # %% CELL 13 - gene-level results for each comparison group
-# GENE-LEVEL x EACH comparison group - FULL COUNTS (view inside the Workbench only)
+# GENE-LEVEL x EACH comparison group - FULL COUNTS --can't be exported if <20 
 from statsmodels.stats.multitest import multipletests
 pd.set_option("display.width", 250, "display.max_rows", 500)
 q = QUAL["Primary (coding, >=1*)"]
