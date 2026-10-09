@@ -1,12 +1,13 @@
-# %% PRS-G3 - genome-wide score (PGS002288), one chromosome at a time
+# %% PRS-G3 - genome-wide score (PGS002288), one chromosome at a time - has a real tendency to crash or run into billing errors
 # Each chromosome is saved to the bucket as soon as it finishes. Re-running this cell skips
-# chromosomes already saved, so if the kernel, cluster or connection dies, just run it again.
+# chromosomes already saved, so if the kernel, cluster or connection dies, just run it again and it'll pick back up.
+# It will run happily in the background but if going too slow add more workers. 
 import os, subprocess, time
 import pandas as pd
 import hail as hl
 
 P = "YOUR-WORKSPACE-ID"
-PRS_OUT = "gs://vpa-full-YOUR-WORKSPACE-ID/prs"
+PRS_OUT = "gs://YOUR-WORKSPACE-ID/prs"
 GW_OUT = f"{PRS_OUT}/pgs002288_by_chr"
 MT_PATH = "gs://vwb-aou-datasets-controlled/v9/wgs/short_read/snpindel/acaf_threshold/splitMT/hail.mt"
 LOCAL_PGS = "/tmp/PGS002288_hmPOS_GRCh38.txt.gz"                      # /tmp, never the notebook folder
@@ -16,7 +17,7 @@ def gs_exists(path):
 
 hl.init(idempotent=True, gcs_requester_pays_configuration=P)
 
-# weights (same filtering as the chr22 pilot)
+# weights (same filtering as before)
 if not os.path.exists(LOCAL_PGS):
     subprocess.run(["gsutil", "-q", "cp", f"{PRS_OUT}/PGS002288_hmPOS_GRCh38.txt.gz", LOCAL_PGS], check=True)
 pgs = pd.read_csv(LOCAL_PGS, sep="\t", comment="#", dtype=str)
@@ -38,7 +39,7 @@ for name in ["early_pop", "later_pop", "controls"]:
     ids |= set(pd.read_csv(f"/tmp/prs_{name}.csv", dtype=str, usecols=["person_id"])["person_id"])
 print(f"women to score: {len(ids):,}")
 
-# chr22 was already scored in the pilot - reuse it instead of running it again
+# chr22 was already scored in the pilot - telling the thing to reuse it instead of running it again
 if gs_exists(f"{PRS_OUT}/pgs002288_chr22.tsv.bgz") and not gs_exists(f"{GW_OUT}/chr22.tsv.bgz"):
     subprocess.run(["gsutil", "-q", "cp", f"{PRS_OUT}/pgs002288_chr22.tsv.bgz", f"{GW_OUT}/chr22.tsv.bgz"], check=True)
 
@@ -52,7 +53,7 @@ for c in chroms:
         continue
     t0 = time.time()
     w = pgs[pgs["hm_chr"] == c]
-    both = pd.concat([                                                  # both orientations: ref/alt order never matters
+    both = pd.concat([                                                 
         pd.DataFrame({"pos": w["hm_pos"].astype(int).values, "a0": w[other].values,
                       "a1": w["effect_allele"].values, "w": w["effect_weight"].values, "flip": False}),
         pd.DataFrame({"pos": w["hm_pos"].astype(int).values, "a0": w["effect_allele"].values,
@@ -85,7 +86,7 @@ print("all chromosomes saved" if done_w == total_w else "stopped before the end 
 
 
 # %% PRS-G4 - add up the chromosomes and rerun the PRS analysis with the genome-wide score
-# Self-contained: works in a fresh kernel (no Hail needed).
+# Self-contained: works in a fresh kernel -- means you don't have to reinit hail yay
 import os, subprocess
 import numpy as np, pandas as pd
 import statsmodels.api as sm
@@ -106,8 +107,7 @@ for c in chroms:
     s = pd.read_csv(f"/tmp/gw/chr{c}.tsv.bgz", sep="\t", compression="gzip", dtype={"person_id": str})
     s = s.set_index("person_id").iloc[:, 0].astype(float)          # first data column = that chromosome's score
     total = s if total is None else total.add(s, fill_value=0)
-gw = -total.rename("prs_gw")      # NEGATED: PGS002288's weights have the opposite sign to the published odds ratios
-                                  # at every lead SNP found in the file (PRS-G5), so higher score = more POP risk only after this
+gw = -total.rename("prs_gw")      s
 print(f"genome-wide score built for {len(gw):,} women from {len(chroms)} chromosomes (sign corrected)")
 
 # cohorts, the 29-SNP score for comparison, age and ancestry
