@@ -40,7 +40,7 @@ for g in all_genes:
     rows += stats("Gene", g, [g], mech)
 bd = pd.DataFrame(rows)
 
-# Benjamini-Hochberg within each comparison: across the 9 mechanisms, and across genes
+# Benjamini-Hochberg correction for each comparison: across all 9 mechanisms, and across all genes
 bd["q"] = np.nan
 for level in ["Mechanism", "Gene"]:
     for grp in groups:
