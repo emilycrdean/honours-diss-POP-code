@@ -84,10 +84,10 @@ read_ukb_fixed <- function(path) {
   read.csv(text = raw, na.strings = c("", " "))
 }
 
-mfn1 <- read_ukb_fixed("mfn1.2.csv")
+mfn1 <- read_ukb_fixed("mfn1.2.csv")  # or whatever they might be called
 mfn2 <- read_ukb_fixed("mfn2.2.csv")
 
-# Field 3872 not in extract: age at first birth unavailable for women with one live birth
+# Field 3872 not in extract: age at first birth unavailable for women with one live birth which is slightly sticky 
 if (!"age_primiparous" %in% names(mfn1)) mfn1$age_primiparous <- NA
 if (!"age_primiparous" %in% names(mfn2)) mfn2$age_primiparous <- NA
 ```
@@ -102,7 +102,8 @@ The raw data require cleaning because of:
 **Notes on specific variables:**
 
 - `DOB` (year of birth) is binned into 5-year intervals for exact matching. This
-  allows better control availability than exact-year matching.
+  allows better control availability than exact-year matching - did this originally because one individual in particular wasn't matching. It is now basically an artefact, but it is not harmful. Remove if able to match exact on age and it is important. 
+
 - UK Biobank negative codes (-3 prefer not to answer, -4 do not remember) are set
   to missing for parity and age at first birth.
 - Smoking and menopausal status are coded as factors, with missing or non-standard
