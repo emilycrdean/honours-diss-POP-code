@@ -6,8 +6,8 @@
 
 
 # ---- CELL A: build the case data frame ----------------------------------
-# >>> change this one line per notebook: "oi_case", "cutis_laxa_case" or "hypermobility_case"
-case_label <- "oi_case"
+# >>> change this one line per notebook: "oi_case", "eds_case" or "hypermobility_case"
+case_label <- "condition_case"
 
 library(tidyverse)
 
@@ -61,7 +61,7 @@ library(survival)
 library(MatchIt)
 library(broom)
 
-system("gsutil cp gs://rerun-controls-YOUR-WORKSPACE-ID/control_analysis_df_v3.rds /tmp/")
+system("gsutil cp gs://YOUR-WORKSPACE-ID/control_analysis_df_v3.rds /tmp/")
 control_df <- readRDS("/tmp/control_analysis_df_v3.rds")
 stopifnot(nrow(control_df) > 250000, all(control_df$cohort == "control"))   # guards against a wrong file
 
