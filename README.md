@@ -16,8 +16,8 @@ The project asked two questions:
 | `01_ukb_marfan/` | UK Biobank Marfan syndrome analysis (Aim 1) |
 | `02_aou_ctd/` | All of Us connective tissue disorder analyses (Aim 1) |
 | `03_aou_rare_variants/` | All of Us rare variant analysis (Aim 2) |
-| `04_prs/` | Exploratory polygenic score analysis (Supplementary Methods S1) |
-| `05_figures_tables/` | Thesis figures (R) and Word tables (Node.js) |
+| `04_prs/` | Exploratory polygenic score analysis (Supplementary Methods 1) |
+
 
 ### 01_ukb_marfan
 
@@ -33,7 +33,7 @@ The project asked two questions:
 
 These scripts are pasted as cells into Workbench R notebooks, one notebook per cohort, in the numbered order. They go below the cells the Dataset Builder generates.
 
-Cohorts were built in the All of Us Cohort Builder using the concept sets listed in Supplementary Table S2 of the thesis. The Dataset Builder generates the code that loads each cohort, and that code is specific to each workspace, so it is not included here.
+Cohorts were built in the All of Us Cohort Builder using the concept sets listed in Supplementary Table S2 of the thesis. The Dataset Builder generates the code that loads each cohort, and that code is specific to each workspace, so it is not included
 
 - `01_build_analysis_dataset.R`: one row per participant. This step:
   - classifies POP and menopause codes;
@@ -89,10 +89,6 @@ This is a Python notebook pipeline. Each `# %%` block is one cell.
 - `aim1_figures.R`, `flow_diagrams.R`, `pva_results_figures.R` and `aou_or_bars.R`: thesis figures, drawn from aggregate results only.
 - `make_*.js`: build the Word tables with the `docx` npm package (`node make_aim1_tables.js` and so on). They write to `thesis_figures/`.
 
-## Data access
-
-- **All of Us Research Program:** Controlled Tier, Curated Data Repository C2025Q4R6. Short-read whole-genome sequence data (v9) are read via the ACAF-threshold split Hail matrix table and the Variant Annotation Table. Access requires registration and Controlled Tier training at https://www.researchallofus.org.
-- **UK Biobank:** approved application. Data are available through the UK Biobank Access Management System.
 
 Workspace-specific identifiers have been replaced with placeholders. Before running, replace these with your own workspace's values:
 
@@ -111,5 +107,3 @@ In line with the All of Us Data and Statistics Dissemination Policy, the scripts
 - **R (≥ 4.3):** tidyverse, dplyr, lubridate, MatchIt, survival, survminer, broom, tableone.
 - **Python 3:** pandas, numpy, scipy, statsmodels, hail, google-cloud-bigquery.
 - **Node.js:** docx (tables only).
-
-Exact R package versions for the UK Biobank analysis are printed by the `session-info` chunk of `marfan_analysis.Rmd`.
