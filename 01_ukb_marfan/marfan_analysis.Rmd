@@ -1,0 +1,694 @@
+---
+title: "Marfan syndrome and pelvic organ prolapse: UK Biobank matched analysis"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    theme: flatly
+    code_folding: show
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,   # note: this hides coercion warnings - see explicit checks below
+  message = FALSE,
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center"
+)
+```
+
+# Overview
+
+1. Cleans and harmonises case (Marfan) and control data
+2. Performs propensity-score matching (1:4, exact on 5-year birth cohort)
+3. Assesses covariate balance after matching
+4. Primary analysis: conditional logistic regression for POP in cases vs. matched controls
+5. Sensitivity and robustness analyses: Fisher's exact test, adjustment for age at
+   first birth, 1:10 matching, full-cohort adjusted logistic regression, and
+   variability across equally valid matched samples
+6. Exploratory: time to POP, parity as an effect modifier
+
+# Setup
+
+## Required packages
+
+```{r install-packages, eval=FALSE}
+# Run once manually if needed - not run on knit, so package versions stay fixed
+install.packages(c("MatchIt", "dplyr", "tableone", "lubridate",
+                   "survival", "survminer", "tidyverse"))
+```
+
+```{r load-packages}
+library(MatchIt)
+library(dplyr)
+library(tableone)
+library(lubridate)
+library(survival)
+library(survminer)
+library(tidyverse)
+```
+
+## Reading in the data
+
+The data files must be located in the current working directory and named
+exactly as below. Double-check file paths/names if this step fails.
+
+2,491 lines in the control file contain an extra, unlabelled field (a date or
+blank) between `BMI` and `ever_smoked`. Read as-is, this shifts smoking and
+menopause values for those rows. The function below removes the extra field
+before the file is read, and checks every line then has 11 fields.
+
+```{r read-data}
+read_ukb_fixed <- function(path) {
+  raw <- readLines(path)
+  n_fields <- count.fields(path, sep = ",", quote = "\"",
+                           comment.char = "", blank.lines.skip = FALSE)
+  stopifnot(length(n_fields) == length(raw))
+
+  bad <- n_fields == 12
+  cat(path, "- lines with an extra field removed:", sum(bad), "\n")
+
+  # Drop the 10th field (unlabelled date between BMI and ever_smoked)
+  raw[bad] <- sub("^((?:[^,]*,){9})[^,]*,", "\\1", raw[bad], perl = TRUE)
+
+  # Every line should now have 11 fields
+  check <- count.fields(textConnection(raw), sep = ",", quote = "\"",
+                        comment.char = "", blank.lines.skip = FALSE)
+  stopifnot(all(check == 11))
+
+  read.csv(text = raw, na.strings = c("", " "))
+}
+
+mfn1 <- read_ukb_fixed("mfn1.2.csv")
+mfn2 <- read_ukb_fixed("mfn2.2.csv")
+
+# Field 3872 not in extract: age at first birth unavailable for women with one live birth
+if (!"age_primiparous" %in% names(mfn1)) mfn1$age_primiparous <- NA
+if (!"age_primiparous" %in% names(mfn2)) mfn2$age_primiparous <- NA
+```
+
+# Data Cleaning
+
+The raw data require cleaning because of:
+
+- A high prevalence of missing values (`NA`)
+- The need for consistent variable types across cases and controls for matching
+
+**Notes on specific variables:**
+
+- `DOB` (year of birth) is binned into 5-year intervals for exact matching. This
+  allows better control availability than exact-year matching.
+- UK Biobank negative codes (-3 prefer not to answer, -4 do not remember) are set
+  to missing for parity and age at first birth.
+- Smoking and menopausal status are coded as factors, with missing or non-standard
+  responses kept as their own level ("Unknown", "Unsure/unknown") rather than
+  dropped. "Not sure - had a hysterectomy" is kept as a separate menopause level.
+- Age at first birth is available only for women with two or more live births
+  (field 2754); field 3872 (women with one live birth) was not in the extract.
+
+> **Before running:** check `range(ukb_data$DOB, na.rm = TRUE)` and adjust the
+> `seq()` bounds in `DOB_bin` below if birth years fall outside 1930-1975.
+
+```{r clean-function}
+clean_df <- function(df, ctd_value, cohort_value) {
+
+  if (!"age_primiparous" %in% names(df)) {
+    stop("Column 'age_primiparous' not found - check the read-in chunk.")
+  }
+
+  df %>%
+    mutate(
+      CTD            = ctd_value,
+      cohort         = cohort_value,
+      POP            = as.integer(!is.na(POP_diagnosis)),
+      POP_diagnosis  = as.Date(POP_diagnosis),
+      DOB            = as.numeric(DOB),
+      BMI            = as.numeric(BMI),
+      townsend_deprivation = as.numeric(townsend_deprivation),
+      eid            = as.numeric(eid),
+      CTD            = as.numeric(CTD),
+
+      # UKB negative codes (-3 prefer not to answer, -4 do not remember) -> NA
+      X._live_birth      = ifelse(as.numeric(X._live_birth) < 0, NA,
+                                  as.numeric(X._live_birth)),
+      age_at_first_birth = ifelse(as.numeric(age_at_first_birth) < 0, NA,
+                                  as.numeric(age_at_first_birth)),   # field 2754
+      age_primiparous    = ifelse(as.numeric(age_primiparous) < 0, NA,
+                                  as.numeric(age_primiparous)),      # field 3872 (empty)
+
+      # Combined age at first birth
+      age_first_birth_all = case_when(
+        X._live_birth == 0 ~ NA_real_,
+        X._live_birth == 1 ~ age_primiparous,
+        X._live_birth >= 2 ~ age_at_first_birth
+      ),
+
+      # Banded version for the balance table
+      afb_band = factor(
+        case_when(
+          X._live_birth == 0          ~ "No births",
+          X._live_birth == 1          ~ "One birth (age n/a)",
+          is.na(age_first_birth_all)  ~ "Unknown",
+          age_first_birth_all < 20    ~ "<20",
+          age_first_birth_all < 25    ~ "20-24",
+          age_first_birth_all < 30    ~ "25-29",
+          TRUE                        ~ "30+"
+        ),
+        levels = c("No births", "One birth (age n/a)",
+                   "<20", "20-24", "25-29", "30+", "Unknown")
+      ),
+
+      # Binary version for the sensitivity model: first birth before 25
+      early_first_birth = factor(
+        case_when(
+          X._live_birth == 0          ~ "No",
+          X._live_birth == 1          ~ "One birth (age n/a)",
+          is.na(age_first_birth_all)  ~ "Unknown",
+          age_first_birth_all < 25    ~ "Yes",
+          TRUE                        ~ "No"
+        ),
+        levels = c("No", "Yes", "One birth (age n/a)", "Unknown")
+      ),
+
+      ever_smoked = factor(
+        case_when(
+          as.character(ever_smoked) == "Yes" ~ "Yes",
+          as.character(ever_smoked) == "No"  ~ "No",
+          TRUE                               ~ "Unknown"
+        ),
+        levels = c("No", "Yes", "Unknown")
+      ),
+
+      had_menopause = factor(
+        case_when(
+          as.character(had_menopause) == "Yes" ~ "Yes",
+          as.character(had_menopause) == "No"  ~ "No",
+          grepl("hysterectomy", as.character(had_menopause),
+                ignore.case = TRUE)            ~ "Hysterectomy",
+          TRUE                                 ~ "Unsure/unknown"
+        ),
+        levels = c("No", "Yes", "Hysterectomy", "Unsure/unknown")
+      ),
+
+      DOB_bin = cut(
+        as.numeric(DOB),
+        breaks = seq(1930, 1975, by = 5),
+        right  = FALSE,
+        labels = c("1930-34", "1935-39", "1940-44", "1945-49",
+                   "1950-54", "1955-59", "1960-64", "1965-69",
+                   "1970-74")
+      ),
+      DOB_month = as.factor(DOB_month),
+      cohort    = as.factor(cohort)
+    )
+}
+```
+
+```{r apply-cleaning}
+# Raw values before cleaning (cases)
+table(mfn1$ever_smoked, useNA = "always")
+table(mfn1$had_menopause, useNA = "always")
+
+cases    <- clean_df(mfn1, ctd_value = 1, cohort_value = "cases")
+controls <- clean_df(mfn2, ctd_value = 0, cohort_value = "controls")
+ukb_data <- bind_rows(cases, controls)
+```
+
+## Coercion checks
+
+Warnings are switched off in this document, so values that fail to convert to
+numbers are counted explicitly here instead.
+
+```{r coercion-checks}
+check_coercion <- function(x) {
+  bad <- x[!is.na(x) & is.na(suppressWarnings(as.numeric(x)))]
+  list(n_bad = length(bad), examples = head(unique(bad), 10))
+}
+
+check_coercion(mfn1$eid)
+check_coercion(mfn2$eid)
+check_coercion(mfn2$X._live_birth)
+check_coercion(mfn2$age_at_first_birth)
+check_coercion(mfn2$BMI)
+check_coercion(mfn2$townsend_deprivation)
+
+cat("Rows with missing eid after cleaning:", sum(is.na(ukb_data$eid)), "\n")
+```
+
+## Sanity checks on date-of-birth binning
+
+```{r dob-check}
+cat("DOB range:", range(ukb_data$DOB, na.rm = TRUE), "\n")
+cat("Cases with NA DOB_bin:", sum(is.na(ukb_data$DOB_bin[ukb_data$cohort == "cases"])), "\n")
+```
+
+## Filtering complete cases
+
+All Marfan cases are retained regardless of missingness, while controls are
+restricted to those with complete data on the covariates used for matching.
+(Smoking and menopausal status cannot be `NA` after recoding, as missing
+responses form their own level.)
+
+```{r filter-complete}
+ukb_clean <- ukb_data %>%
+  filter(
+    cohort == "cases" |
+      (cohort == "controls" &
+         !is.na(townsend_deprivation) &
+         !is.na(DOB) &
+         !is.na(DOB_bin) &
+         !is.na(BMI) &
+         !is.na(X._live_birth) &
+         !is.na(ever_smoked) &
+         !is.na(had_menopause))
+  )
+
+stopifnot(sum(ukb_clean$cohort == "cases") == 37)
+```
+
+```{r filter-sanity-checks}
+table(ukb_clean$cohort)
+table(ukb_clean$cohort, ukb_clean$POP)   # POP counts in the full cohort
+table(ukb_clean$DOB_bin, ukb_clean$cohort)
+
+# Recoded variables: nothing lost or collapsed?
+table(ukb_clean$ever_smoked, ukb_clean$cohort, useNA = "always")
+table(ukb_clean$had_menopause, ukb_clean$cohort, useNA = "always")
+table(ukb_clean$afb_band, ukb_clean$cohort, useNA = "always")
+table(ukb_clean$early_first_birth, ukb_clean$cohort, useNA = "always")
+```
+
+# Propensity Score Matching
+
+Each case is matched to four controls without replacement by nearest-neighbour
+matching on a logistic regression propensity score estimated from Townsend
+deprivation, birth cohort, BMI, smoking status, menopausal status, and number
+of live births. Matching is exact on 5-year birth cohort (`DOB_bin`) and
+restricted to a caliper of 0.2 standard deviations of the propensity score.
+Ethnicity is not included as a matching variable because all Marfan cases are
+recorded as White British.
+
+```{r prep-matching}
+ukb_clean$marfan <- ifelse(ukb_clean$cohort == "cases", 1, 0)
+
+ps_formula <- marfan ~
+  townsend_deprivation +
+  DOB_bin +
+  BMI +
+  ever_smoked +
+  had_menopause +
+  X._live_birth
+```
+
+```{r match}
+match_out <- matchit(
+  formula     = ps_formula,
+  data        = ukb_clean,
+  method      = "nearest",
+  ratio       = 4,
+  distance    = "glm",
+  caliper     = 0.2,
+  std.caliper = TRUE,
+  exact       = ~ DOB_bin,
+  verbose     = FALSE
+)
+
+summary(match_out)
+
+matched_data <- match.data(match_out) %>%
+  mutate(cohort = factor(cohort, levels = c("controls", "cases")))  # controls = reference
+
+# Stop if any case failed to match
+n_matched_cases <- sum(matched_data$marfan == 1)
+if (n_matched_cases < 37) {
+  stop(paste("Only", n_matched_cases, "of 37 cases matched - check the propensity model."))
+}
+```
+
+## Post-matching sanity checks
+
+```{r matched-sanity-checks}
+table(matched_data$cohort)
+table(table(matched_data$subclass))   # matched-set sizes (5 = 1 case + 4 controls)
+table(matched_data$had_menopause, matched_data$cohort)
+```
+
+# Balance Diagnostics
+
+Standardised mean differences (SMD) below 0.1 indicate good balance between
+cases and controls. Age at first birth (`afb_band`) was not a matching variable
+and is shown for information.
+
+```{r balance-table}
+vars_to_check <- c("DOB", "DOB_bin", "BMI", "townsend_deprivation",
+                   "ever_smoked", "had_menopause",
+                   "X._live_birth", "afb_band")
+
+tab_matched <- CreateTableOne(
+  vars   = vars_to_check,
+  strata = "cohort",
+  data   = matched_data,
+  test   = FALSE
+)
+
+print(tab_matched, smd = TRUE)
+```
+
+# Primary Analysis: Conditional Logistic Regression
+
+All odds ratios compare Marfan cases with controls (controls = reference).
+
+```{r pop-counts}
+pop_tab <- table(matched_data$cohort, matched_data$POP)
+pop_tab
+round(prop.table(pop_tab, 1) * 100, 1)
+```
+
+```{r clr-primary}
+clr_model <- clogit(POP ~ cohort + strata(subclass),
+                    data = matched_data, method = "exact")
+round(exp(cbind(OR = coef(clr_model), confint(clr_model))), 2)
+summary(clr_model)$coefficients[, "Pr(>|z|)"]
+```
+
+# Sensitivity and Robustness Analyses
+
+## Fisher's exact test
+
+Ignores the matched sets; included as a check given the small number of events.
+
+```{r fisher-test}
+fisher_result <- fisher.test(pop_tab)
+round(c(OR    = unname(fisher_result$estimate),
+        lower = fisher_result$conf.int[1],
+        upper = fisher_result$conf.int[2],
+        p     = fisher_result$p.value), 3)
+```
+
+## Adjustment for first birth before age 25
+
+Age at first birth was not matched on. This model additionally adjusts for first
+birth before 25 (available only for women with two or more live births).
+
+```{r clr-afb}
+matched_data$early_first_birth <- droplevels(matched_data$early_first_birth)
+
+clr_afb <- clogit(POP ~ cohort + early_first_birth + strata(subclass),
+                  data = matched_data, method = "exact")
+round(exp(cbind(OR = coef(clr_afb), confint(clr_afb))), 2)
+summary(clr_afb)$coefficients[, "Pr(>|z|)"]
+```
+
+## 1:10 matching
+
+```{r match-1to10}
+match_out_10 <- matchit(
+  formula     = ps_formula,
+  data        = ukb_clean,
+  method      = "nearest",
+  ratio       = 10,
+  distance    = "glm",
+  caliper     = 0.2,
+  std.caliper = TRUE,
+  exact       = ~ DOB_bin,
+  verbose     = FALSE
+)
+
+matched_10 <- match.data(match_out_10) %>%
+  mutate(cohort = factor(cohort, levels = c("controls", "cases")))
+
+table(matched_10$cohort)
+table(matched_10$cohort, matched_10$POP)
+
+clr_10 <- clogit(POP ~ cohort + strata(subclass),
+                 data = matched_10, method = "exact")
+round(exp(cbind(OR = coef(clr_10), confint(clr_10))), 2)
+summary(clr_10)$coefficients[, "Pr(>|z|)"]
+```
+
+## Full cohort, no matching
+
+Logistic regression across all eligible women, adjusted for the matching covariates.
+
+```{r full-cohort}
+full_fit <- glm(POP ~ marfan + DOB_bin + BMI + townsend_deprivation +
+                  ever_smoked + had_menopause + X._live_birth,
+                data = ukb_clean, family = binomial)
+
+round(exp(cbind(OR = coef(full_fit), confint.default(full_fit)))["marfan", ], 2)
+summary(full_fit)$coefficients["marfan", "Pr(>|z|)"]
+
+# All 37 cases used? (glm silently drops rows with missing covariates)
+sum(full_fit$model$marfan)
+nrow(full_fit$model)
+```
+
+## Variability across equally valid matches
+
+The 1:4 match draws 148 controls from over 216,000. For each case, every control
+in the same birth cohort and within the caliper is an equally acceptable match.
+This section counts those candidates, then repeatedly draws 4 of them at random
+per case to show how much the OR varies across valid matched samples.
+
+```{r random-within-caliper}
+set.seed(2026)
+
+ps_fit <- glm(ps_formula, data = ukb_clean, family = binomial)
+ps     <- ps_fit$fitted.values
+cal    <- 0.2 * sd(ps)
+
+case_idx <- which(ukb_clean$marfan == 1)
+ctrl_idx <- which(ukb_clean$marfan == 0)
+
+# Candidate controls for each case: same birth cohort, within the caliper
+pools <- lapply(case_idx, function(i) {
+  ctrl_idx[ukb_clean$DOB_bin[ctrl_idx] == ukb_clean$DOB_bin[i] &
+           abs(ps[ctrl_idx] - ps[i]) <= cal]
+})
+
+# How many equally valid controls each case has, and what share of them have POP
+pool_size <- sapply(pools, length)
+pool_pop  <- sapply(pools, function(p) mean(ukb_clean$POP[p]))
+summary(pool_size)
+round(summary(pool_pop), 3)
+
+# Expected number of matched controls with POP in any valid 1:4 match
+exp_pop <- sum(4 * pool_pop)
+sd_pop  <- sqrt(sum(4 * pool_pop * (1 - pool_pop)))
+round(c(expected = exp_pop,
+        low  = exp_pop - 2 * sd_pop,
+        high = exp_pop + 2 * sd_pop), 1)
+
+# 500 random valid matched samples
+rand_df <- bind_rows(lapply(1:500, function(r) {
+  sets <- bind_rows(lapply(seq_along(case_idx), function(k) {
+    p <- pools[[k]]
+    data.frame(row = c(case_idx[k], p[sample.int(length(p), min(4, length(p)))]),
+               subclass = k)
+  }))
+  d <- ukb_clean[sets$row, ]
+  d$subclass <- sets$subclass
+  d$cohort <- factor(d$cohort, levels = c("controls", "cases"))
+  fit <- clogit(POP ~ cohort + strata(subclass), data = d, method = "exact")
+  data.frame(or       = unname(exp(coef(fit))),
+             p        = unname(summary(fit)$coefficients[, "Pr(>|z|)"]),
+             ctrl_pop = sum(d$POP[d$cohort == "controls"]))
+}))
+
+round(quantile(rand_df$or, c(0.025, 0.25, 0.5, 0.75, 0.975)), 2)
+mean(rand_df$or > 1)
+mean(rand_df$p < 0.05)
+summary(rand_df$ctrl_pop)
+
+hist(rand_df$or, breaks = 30, main = "OR across 500 equally valid matched samples",
+     xlab = "Odds ratio (Marfan vs controls)")
+abline(v = 1, lty = 2)
+```
+
+# Exploratory: Time to POP Diagnosis
+
+Age is calculated from year and month of birth (day set to the 15th, as full
+date of birth is not released). Follow-up starts on 1 April 1997, when linked
+hospital records begin in England, and ends on 30 November 2022. Each woman
+enters the analysis at her age on the start date (late entry). Women whose POP
+was recorded before the start date are excluded from this analysis, as their
+time at risk cannot be observed.
+
+```{r survival-prep}
+follow_up_start <- as.Date("1997-04-01")
+censor_date     <- as.Date("2022-11-30")
+
+matched_data <- matched_data %>%
+  mutate(
+    dob_month_num = match(as.character(DOB_month), month.name),
+    dob_month_num = ifelse(is.na(dob_month_num), 7, dob_month_num),
+    dob_date      = as.Date(paste(DOB, dob_month_num, 15, sep = "-")),
+    age_at_POP    = ifelse(POP == 1,
+                           as.numeric(POP_diagnosis - dob_date) / 365.25, NA),
+    entry_age     = as.numeric(follow_up_start - dob_date) / 365.25,
+    exit_age      = ifelse(POP == 1, age_at_POP,
+                           as.numeric(censor_date - dob_date) / 365.25),
+    event         = as.integer(POP == 1),
+    prevalent     = POP == 1 & POP_diagnosis <= follow_up_start
+  )
+
+# Year of POP diagnosis by group, and how many fall before follow-up starts
+table(format(matched_data$POP_diagnosis, "%Y"), matched_data$cohort)
+table(prevalent = matched_data$prevalent, matched_data$cohort)
+
+surv_data <- matched_data %>% filter(!prevalent)
+table(surv_data$cohort, surv_data$event)
+```
+
+```{r pop-age-check}
+pop_dates <- ukb_clean %>%
+  filter(POP == 1) %>%
+  mutate(year_of_POP = as.numeric(format(POP_diagnosis, "%Y")),
+         age_at_POP  = year_of_POP - DOB)
+
+# How many POP records have no usable date, or an implausible one?
+pop_dates %>%
+  group_by(cohort) %>%
+  summarise(n            = n(),
+            no_date      = sum(is.na(POP_diagnosis)),
+            before_birth = sum(year_of_POP < DOB, na.rm = TRUE),
+            after_2022   = sum(year_of_POP > 2022, na.rm = TRUE))
+
+# What the undated records look like in the raw file
+undated <- pop_dates$eid[is.na(pop_dates$POP_diagnosis)]
+head(unique(mfn2$POP_diagnosis[mfn2$eid %in% undated]), 20)
+
+# Age at POP diagnosis, plausible dates only (descriptive)
+pop_dates %>%
+  filter(!is.na(age_at_POP), year_of_POP >= DOB, year_of_POP <= 2022) %>%
+  group_by(cohort) %>%
+  summarise(n             = n(),
+            median        = median(age_at_POP),
+            q1            = quantile(age_at_POP, 0.25),
+            q3            = quantile(age_at_POP, 0.75),
+            before_50     = sum(age_at_POP < 50),
+            pct_before_50 = round(mean(age_at_POP < 50) * 100, 1))
+
+# What are the post-2022 dates?
+table(format(pop_dates$POP_diagnosis[pop_dates$year_of_POP > 2022], "%Y"))
+max(pop_dates$POP_diagnosis, na.rm = TRUE)
+
+# Age at POP within the matched sample (same birth cohorts)
+matched_data %>%
+  filter(POP == 1) %>%
+  group_by(cohort) %>%
+  summarise(n         = n(),
+            median    = round(median(age_at_POP), 1),
+            q1        = round(quantile(age_at_POP, 0.25), 1),
+            q3        = round(quantile(age_at_POP, 0.75), 1),
+            before_50 = sum(age_at_POP < 50))
+```
+
+## Kaplan-Meier curves
+
+```{r km-curves, fig.width=8, fig.height=6}
+km_fit <- survfit(Surv(entry_age, exit_age, event) ~ cohort, data = surv_data)
+
+ggsurvplot(km_fit,
+           data        = surv_data,
+           conf.int    = TRUE,
+           censor      = FALSE,
+           xlim        = c(40, 85),
+           xlab        = "Age (years)",
+           ylab        = "Proportion free of POP",
+           title       = "Time to POP diagnosis: Marfan vs matched controls",
+           legend.labs = c("Controls", "Marfan"),
+           palette     = c("#E87070", "#70B8E8"))
+```
+
+## Cox proportional hazards model
+
+Stratified by matched set, with late entry at the start of follow-up.
+
+```{r cox-model}
+cox_model <- coxph(Surv(entry_age, exit_age, event) ~ cohort + strata(subclass),
+                   data = surv_data)
+round(exp(cbind(HR = coef(cox_model), confint(cox_model))), 2)
+summary(cox_model)$coefficients[, "Pr(>|z|)"]
+
+cox.zph(cox_model)   # proportional hazards check
+```
+
+# Exploratory: Parity as an Effect Modifier
+
+With few POP events among cases, this interaction is exploratory only. In this
+model, `cohortcases` is the Marfan OR at zero live births, and the interaction
+term is the change in that OR per additional birth.
+
+```{r clr-parity}
+clr_parity <- clogit(POP ~ cohort * X._live_birth + strata(subclass),
+                     data   = matched_data,
+                     method = "exact")
+summary(clr_parity)
+```
+
+The menopause interaction model is not run: with four menopause levels and few
+events, it cannot be estimated reliably.
+
+# Supplementary Plots
+
+## Covariate balance plot
+
+```{r balance-plot}
+plot(summary(match_out), abs = TRUE)
+```
+
+Balance for each matching variable is shown in the balance table above; SMDs
+above 0.1 indicate residual imbalance after matching. Age at first birth was not
+a matching variable and is addressed in the sensitivity analysis above.
+
+## POP rate by cohort
+
+```{r pop-rate-bar}
+matched_data %>%
+  group_by(cohort) %>%
+  summarise(pop_rate = mean(POP) * 100) %>%
+  ggplot(aes(x = cohort, y = pop_rate, fill = cohort)) +
+  geom_bar(stat = "identity") +
+  labs(title = "POP Rate by Cohort",
+       x = "", y = "POP Rate (%)") +
+  theme_minimal()
+```
+
+## Age at POP diagnosis
+
+```{r age-at-pop-hist}
+matched_data %>%
+  filter(POP == 1) %>%
+  ggplot(aes(x = age_at_POP, fill = cohort)) +
+  geom_histogram(alpha = 0.6, bins = 10, position = "dodge") +
+  labs(title = "Age at POP Diagnosis",
+       x = "Age (years)", y = "Count") +
+  theme_minimal()
+```
+
+## Parity by POP status and cohort
+
+*Exploratory only.*
+
+```{r parity-pop-bar}
+matched_data %>%
+  mutate(POP = factor(POP, labels = c("No POP", "POP"))) %>%
+  ggplot(aes(x = factor(X._live_birth), fill = POP)) +
+  geom_bar(position = "dodge") +
+  facet_wrap(~ cohort) +
+  labs(title = "Parity by POP Status and Cohort",
+       x = "Number of Live Births", y = "Count") +
+  theme_minimal()
+```
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```

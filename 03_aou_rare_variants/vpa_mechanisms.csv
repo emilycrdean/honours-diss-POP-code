@@ -1,0 +1,168 @@
+gene,mechanism
+AEBP1,Structural collagens and collagen-associated matrix
+COL11A1,Structural collagens and collagen-associated matrix
+COL11A2,Structural collagens and collagen-associated matrix
+COL12A1,Structural collagens and collagen-associated matrix
+COL1A1,Structural collagens and collagen-associated matrix
+COL1A2,Structural collagens and collagen-associated matrix
+COL2A1,Structural collagens and collagen-associated matrix
+COL3A1,Structural collagens and collagen-associated matrix
+COL4A1,Structural collagens and collagen-associated matrix
+COL5A1,Structural collagens and collagen-associated matrix
+COL5A2,Structural collagens and collagen-associated matrix
+COL6A1,Structural collagens and collagen-associated matrix
+COL6A2,Structural collagens and collagen-associated matrix
+COL6A3,Structural collagens and collagen-associated matrix
+COL9A1,Structural collagens and collagen-associated matrix
+COL9A2,Structural collagens and collagen-associated matrix
+COL9A3,Structural collagens and collagen-associated matrix
+FN1,Structural collagens and collagen-associated matrix
+TNXB,Structural collagens and collagen-associated matrix
+ADAMTS2,"Collagen biosynthesis, modification and cross-linking"
+ALDH18A1,"Collagen biosynthesis, modification and cross-linking"
+ATP7A,"Collagen biosynthesis, modification and cross-linking"
+BMP1,"Collagen biosynthesis, modification and cross-linking"
+CREB3L1,"Collagen biosynthesis, modification and cross-linking"
+CRTAP,"Collagen biosynthesis, modification and cross-linking"
+FKBP10,"Collagen biosynthesis, modification and cross-linking"
+FKBP14,"Collagen biosynthesis, modification and cross-linking"
+IFITM5,"Collagen biosynthesis, modification and cross-linking"
+LOX,"Collagen biosynthesis, modification and cross-linking"
+LOXL1,"Collagen biosynthesis, modification and cross-linking"
+LOXL2,"Collagen biosynthesis, modification and cross-linking"
+LOXL3,"Collagen biosynthesis, modification and cross-linking"
+LOXL4,"Collagen biosynthesis, modification and cross-linking"
+MBTPS2,"Collagen biosynthesis, modification and cross-linking"
+P3H1,"Collagen biosynthesis, modification and cross-linking"
+P4HA1,"Collagen biosynthesis, modification and cross-linking"
+P4HA2,"Collagen biosynthesis, modification and cross-linking"
+PLOD1,"Collagen biosynthesis, modification and cross-linking"
+PLOD2,"Collagen biosynthesis, modification and cross-linking"
+PLOD3,"Collagen biosynthesis, modification and cross-linking"
+PLS3,"Collagen biosynthesis, modification and cross-linking"
+PPIB,"Collagen biosynthesis, modification and cross-linking"
+PRDM5,"Collagen biosynthesis, modification and cross-linking"
+PYCR1,"Collagen biosynthesis, modification and cross-linking"
+SERPINF1,"Collagen biosynthesis, modification and cross-linking"
+SERPINH1,"Collagen biosynthesis, modification and cross-linking"
+SP7,"Collagen biosynthesis, modification and cross-linking"
+SPARC,"Collagen biosynthesis, modification and cross-linking"
+TMEM38B,"Collagen biosynthesis, modification and cross-linking"
+WNT1,"Collagen biosynthesis, modification and cross-linking"
+ZNF469,"Collagen biosynthesis, modification and cross-linking"
+B3GALT6,Proteoglycans and glycosaminoglycans
+B3GAT3,Proteoglycans and glycosaminoglycans
+B4GALT7,Proteoglycans and glycosaminoglycans
+BGN,Proteoglycans and glycosaminoglycans
+BPNT2,Proteoglycans and glycosaminoglycans
+CHST14,Proteoglycans and glycosaminoglycans
+CHST3,Proteoglycans and glycosaminoglycans
+CSGALNACT1,Proteoglycans and glycosaminoglycans
+DSE,Proteoglycans and glycosaminoglycans
+SLC26A2,Proteoglycans and glycosaminoglycans
+SLC39A13,Proteoglycans and glycosaminoglycans
+VCAN,Proteoglycans and glycosaminoglycans
+ABCC6,Elastic fibres and microfibrils
+ADAMTS10,Elastic fibres and microfibrils
+ADAMTS17,Elastic fibres and microfibrils
+ADAMTSL2,Elastic fibres and microfibrils
+ADAMTSL4,Elastic fibres and microfibrils
+ATP6AP1,Elastic fibres and microfibrils
+ATP6V0A2,Elastic fibres and microfibrils
+ATP6V1A,Elastic fibres and microfibrils
+ATP6V1E1,Elastic fibres and microfibrils
+EFEMP1,Elastic fibres and microfibrils
+EFEMP2,Elastic fibres and microfibrils
+ELN,Elastic fibres and microfibrils
+FBLN5,Elastic fibres and microfibrils
+FBN1,Elastic fibres and microfibrils
+FBN2,Elastic fibres and microfibrils
+GGCX,Elastic fibres and microfibrils
+GORAB,Elastic fibres and microfibrils
+LTBP2,Elastic fibres and microfibrils
+LTBP3,Elastic fibres and microfibrils
+LTBP4,Elastic fibres and microfibrils
+MFAP4,Elastic fibres and microfibrils
+MFAP5,Elastic fibres and microfibrils
+NT5E,Elastic fibres and microfibrils
+RIN2,Elastic fibres and microfibrils
+SLC2A10,Elastic fibres and microfibrils
+ACVR1,TGF-beta and BMP signalling
+ERBIN,TGF-beta and BMP signalling
+IPO8,TGF-beta and BMP signalling
+LEMD3,TGF-beta and BMP signalling
+NOG,TGF-beta and BMP signalling
+NOTCH1,TGF-beta and BMP signalling
+SKI,TGF-beta and BMP signalling
+SMAD2,TGF-beta and BMP signalling
+SMAD3,TGF-beta and BMP signalling
+SMAD4,TGF-beta and BMP signalling
+SMAD6,TGF-beta and BMP signalling
+TAB2,TGF-beta and BMP signalling
+TGFB1,TGF-beta and BMP signalling
+TGFB2,TGF-beta and BMP signalling
+TGFB3,TGF-beta and BMP signalling
+TGFBR1,TGF-beta and BMP signalling
+TGFBR2,TGF-beta and BMP signalling
+ACTA2,"Smooth muscle, cytoskeleton and vessel wall"
+ARIH1,"Smooth muscle, cytoskeleton and vessel wall"
+DES,"Smooth muscle, cytoskeleton and vessel wall"
+FLNA,"Smooth muscle, cytoskeleton and vessel wall"
+FLNB,"Smooth muscle, cytoskeleton and vessel wall"
+FOXE3,"Smooth muscle, cytoskeleton and vessel wall"
+GATA5,"Smooth muscle, cytoskeleton and vessel wall"
+MAT2A,"Smooth muscle, cytoskeleton and vessel wall"
+MYH11,"Smooth muscle, cytoskeleton and vessel wall"
+MYLK,"Smooth muscle, cytoskeleton and vessel wall"
+PKD2,"Smooth muscle, cytoskeleton and vessel wall"
+PRKG1,"Smooth muscle, cytoskeleton and vessel wall"
+ROBO4,"Smooth muscle, cytoskeleton and vessel wall"
+TLN1,"Smooth muscle, cytoskeleton and vessel wall"
+VCL,"Smooth muscle, cytoskeleton and vessel wall"
+C1R,"Matrix remodelling, complement and inflammation"
+C1S,"Matrix remodelling, complement and inflammation"
+IL1B,"Matrix remodelling, complement and inflammation"
+IL6,"Matrix remodelling, complement and inflammation"
+MMP1,"Matrix remodelling, complement and inflammation"
+MMP2,"Matrix remodelling, complement and inflammation"
+MMP3,"Matrix remodelling, complement and inflammation"
+MMP9,"Matrix remodelling, complement and inflammation"
+NLRP3,"Matrix remodelling, complement and inflammation"
+SERPING1,"Matrix remodelling, complement and inflammation"
+TIMP1,"Matrix remodelling, complement and inflammation"
+TIMP2,"Matrix remodelling, complement and inflammation"
+TIMP3,"Matrix remodelling, complement and inflammation"
+TNFRSF1A,"Matrix remodelling, complement and inflammation"
+ESR1,Hormonal signalling and pelvic development
+ESR2,Hormonal signalling and pelvic development
+HOXA11,Hormonal signalling and pelvic development
+HOXA13,Hormonal signalling and pelvic development
+HOXD13,Hormonal signalling and pelvic development
+PGR,Hormonal signalling and pelvic development
+SALL1,Hormonal signalling and pelvic development
+WNT4,Hormonal signalling and pelvic development
+WT1,Hormonal signalling and pelvic development
+ABL1,"Syndromic or other, no direct connective tissue mechanism"
+ALPL,"Syndromic or other, no direct connective tissue mechanism"
+ASPH,"Syndromic or other, no direct connective tissue mechanism"
+CBS,"Syndromic or other, no direct connective tissue mechanism"
+CHD4,"Syndromic or other, no direct connective tissue mechanism"
+COG7,"Syndromic or other, no direct connective tissue mechanism"
+DCHS1,"Syndromic or other, no direct connective tissue mechanism"
+FLCN,"Syndromic or other, no direct connective tissue mechanism"
+HCN4,"Syndromic or other, no direct connective tissue mechanism"
+KIF22,"Syndromic or other, no direct connective tissue mechanism"
+KLK15,"Syndromic or other, no direct connective tissue mechanism"
+LRP2,"Syndromic or other, no direct connective tissue mechanism"
+LZTS1,"Syndromic or other, no direct connective tissue mechanism"
+MED12,"Syndromic or other, no direct connective tissue mechanism"
+MOCS1,"Syndromic or other, no direct connective tissue mechanism"
+NEK9,"Syndromic or other, no direct connective tissue mechanism"
+NEPRO,"Syndromic or other, no direct connective tissue mechanism"
+NKAP,"Syndromic or other, no direct connective tissue mechanism"
+SGMS2,"Syndromic or other, no direct connective tissue mechanism"
+SHOC2,"Syndromic or other, no direct connective tissue mechanism"
+SMS,"Syndromic or other, no direct connective tissue mechanism"
+TALDO1,"Syndromic or other, no direct connective tissue mechanism"
+UPF3B,"Syndromic or other, no direct connective tissue mechanism"
+ZDHHC9,"Syndromic or other, no direct connective tissue mechanism"

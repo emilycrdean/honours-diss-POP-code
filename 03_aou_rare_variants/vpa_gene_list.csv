@@ -1,0 +1,208 @@
+gene,existing_panels,status,pathway,reason
+ABCC6,Wide-147,Keep,,
+ABL1,Wide-147,Keep,,
+ACADM,,Negative control,Negative control,MCAD deficiency
+ACADVL,Add-on-24,Proposed removal,,"Entered via the POP GWAS locus; its ClinVar P/LP variants cause VLCAD deficiency (recessive, metabolic), not a connective tissue mechanism"
+ACTA2,Wide-147,Keep,,
+ACVR1,Wide-147,Keep,,
+ADAMTS10,Wide-147,Keep,,
+ADAMTS17,Wide-147,Keep,,
+ADAMTS2,Wide-147,Keep,,
+ADAMTSL2,Wide-147,Keep,,
+ADAMTSL4,Wide-147,Keep,,
+AEBP1,Wide-147,Keep,,
+ALDH18A1,Wide-147,Keep,,
+ALPL,Wide-147,Keep,,
+ARIH1,Wide-147,Keep,,
+ASPH,Wide-147,Keep,,
+ATP6AP1,Wide-147,Keep,,
+ATP6V0A2,Wide-147,Keep,,
+ATP6V1A,Wide-147,Keep,,
+ATP6V1E1,Wide-147,Keep,,
+ATP7A,Wide-147,Keep,,
+ATP7B,,Negative control,Negative control,Wilson disease
+B3GALT6,Wide-147,Keep,,
+B3GAT3,Wide-147,Keep,,
+B4GALT7,Wide-147,Keep,,
+BGN,Wide-147,Keep,,
+BMP1,,New,Collagen biosynthesis,Procollagen C-proteinase; recessive OI
+BPNT2,Wide-147,Keep,,
+BTD,,Negative control,Negative control,Biotinidase deficiency
+C1R,Wide-147,Keep,,
+C1S,Wide-147,Keep,,
+CBS,Wide-147,Keep,,
+CFTR,,Negative control,Negative control,Cystic fibrosis
+CHD4,Wide-147,Keep,,
+CHRDL2,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+CHST14,Wide-147,Keep,,
+CHST3,Wide-147,Keep,,
+COG7,Wide-147,Keep,,
+COL11A1,Wide-147,Keep,,
+COL11A2,Wide-147,Keep,,
+COL12A1,Wide-147,Keep,,
+COL1A1,Core-10;Wide-147,Keep,,
+COL1A2,Core-10;Wide-147,Keep,,
+COL2A1,Wide-147,Keep,,
+COL3A1,Core-10;Wide-147,Keep,,
+COL4A1,Wide-147,Keep,,
+COL5A1,Core-10;Wide-147,Keep,,
+COL5A2,Core-10;Wide-147,Keep,,
+COL6A1,,New,Structural collagens,Third chain of collagen VI (Bethlem/Ullrich); COL6A2/COL6A3 already included
+COL6A2,Wide-147,Keep,,
+COL6A3,Wide-147,Keep,,
+COL9A1,Wide-147,Keep,,
+COL9A2,Wide-147,Keep,,
+COL9A3,Wide-147,Keep,,
+CREB3L1,Wide-147,Keep,,
+CRISPLD2,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+CRTAP,Wide-147,Keep,,
+CSGALNACT1,Wide-147,Keep,,
+DCHS1,Wide-147,Keep,,
+DES,,New,Smooth muscle,Re-added on mechanism (pelvic floor smooth/skeletal muscle); was dropped for lack of a POP citation
+DLG4,Wide-147,Proposed removal,,"Neuronal (PSD-95); entered via the POP GWAS locus it shares with ACADVL/DVL2, all prior signal was upstream non-coding calls"
+DSE,Wide-147,Keep,,
+DUSP16,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+DVL2,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+EFEMP1,Add-on-24,Keep,,
+EFEMP2,Wide-147,Keep,,
+ELN,Wide-147,Keep,,
+ERBIN,Wide-147,Keep,,
+ESR1,Add-on-24,Keep,,
+ESR2,,New,Hormonal regulation,Oestrogen receptor beta; ESR1 already included
+FAT4,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+FBLN5,Core-10;Wide-147,Keep,,
+FBN1,Core-10;Wide-147,Keep,,
+FBN2,Wide-147,Keep,,
+FKBP10,,New,Collagen biosynthesis,Collagen folding; recessive OI / Bruck syndrome
+FKBP14,Wide-147,Keep,,
+FLCN,Wide-147,Keep,,
+FLNA,Wide-147,Keep,,
+FLNB,Wide-147,Keep,,
+FN1,Wide-147,Keep,,
+FOXE3,Wide-147,Keep,,
+GALT,,Negative control,Negative control,Galactosaemia
+GATA5,Wide-147,Keep,,
+GDF7,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+GGCX,Wide-147,Keep,,
+GJB2,,Negative control,Negative control,Hearing loss
+GORAB,Wide-147,Keep,,
+HCN4,Wide-147,Keep,,
+HEXA,,Negative control,Negative control,Tay-Sachs
+HOXA11,Add-on-24,Keep,,
+HOXA13,,New,Pelvic floor development,Hand-foot-genital syndrome (uterine malformations); HOXA11 already included
+HOXD13,Add-on-24,Keep,,
+IFITM5,,New,Collagen biosynthesis,OI type V; main pathogenic variant is non-coding (5'UTR) - expect it to drop at the coding filter
+IL1B,,New,Inflammation,Drives MMP activation and matrix breakdown
+IL6,,New,Inflammation,Inflammatory matrix degradation
+IMPDH1,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+IPO8,Wide-147,Keep,,
+KIF22,Wide-147,Keep,,
+KLF13,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+KLK1,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK10,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK11,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK12,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK13,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK14,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK15,Wide-147,Keep,,
+KLK2,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK3,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK4,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK5,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK6,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK7,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+KLK8,Wide-147,Proposed removal,,Kallikrein cluster bystander: no connective tissue role and no ClinVar P/LP entries (KLK15 kept as hEDS candidate)
+LAMC1,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+LDAH,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+LEMD3,Wide-147,Keep,,
+LOX,Wide-147,Keep,,
+LOXL1,Add-on-24,Keep,,
+LOXL1-AS1,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+LOXL2,,New,Collagen cross-linking,Lysyl oxidase family; completes LOX/LOXL1/LOXL3/LOXL4
+LOXL3,Wide-147,Keep,,
+LOXL4,,New,Collagen cross-linking,Re-added on mechanism (lysyl oxidase family); was dropped for a null POP citation
+LRP2,Wide-147,Keep,,
+LTBP2,Wide-147,Keep,,
+LTBP3,Wide-147,Keep,,
+LTBP4,Wide-147,Keep,,
+LZTS1,Wide-147,Keep,,
+MAFF,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+MAT2A,Wide-147,Keep,,
+MBTPS2,Wide-147,Keep,,
+MED12,Wide-147,Keep,,
+MFAP4,,New,Elastic fibre assembly,Microfibril-associated protein; MFAP5 already included
+MFAP5,Wide-147,Keep,,
+MMP1,,New,Matrix remodelling,Interstitial collagenase; MMP/TIMP imbalance in prolapsed tissue
+MMP2,,New,Matrix remodelling,Gelatinase A; multicentric osteolysis
+MMP3,,New,Matrix remodelling,Stromelysin; POP candidate-gene studies
+MMP9,,New,Matrix remodelling,Gelatinase B; POP candidate-gene studies
+MMUT,,Negative control,Negative control,Methylmalonic acidaemia
+MOCS1,Wide-147,Keep,,
+MYH11,Wide-147,Keep,,
+MYLK,Wide-147,Keep,,
+NEK9,Wide-147,Keep,,
+NEPRO,Wide-147,Keep,,
+NKAP,Wide-147,Keep,,
+NLRP3,,New,Inflammation,Cryopyrin-associated periodic syndrome; autoinflammatory like TNFRSF1A/TRAPS
+NOG,Wide-147,Keep,,
+NOTCH1,Wide-147,Keep,,
+NT5E,Wide-147,Keep,,
+P3H1,Wide-147,Keep,,
+P4HA1,Wide-147,Keep,,
+P4HA2,,New,Collagen biosynthesis,Collagen prolyl 4-hydroxylase; P4HA1 already included
+PAH,,Negative control,Negative control,Phenylketonuria
+PGR,,New,Hormonal regulation,Progesterone receptor; POP candidate-gene studies
+PKD2,Wide-147,Keep,,
+PLOD1,Wide-147,Keep,,
+PLOD2,,New,Collagen biosynthesis,Telopeptide lysyl hydroxylase; Bruck syndrome
+PLOD3,Wide-147,Keep,,
+PLP1,Wide-147,Proposed removal,,CNS myelin protein (Pelizaeus-Merzbacher); no connective tissue or pelvic mechanism
+PLS3,,New,Collagen biosynthesis,X-linked osteoporosis/OI-like bone fragility
+PPIB,,New,Collagen biosynthesis,Collagen prolyl isomerase; recessive OI
+PRDM5,Wide-147,Keep,,
+PRKG1,Wide-147,Keep,,
+PYCR1,Wide-147,Keep,,
+RIN2,Wide-147,Keep,,
+ROBO3,Wide-147,Proposed removal,,Axon guidance (gaze palsy with scoliosis); scoliosis is secondary to neurological disease
+ROBO4,Wide-147,Keep,,
+SALL1,Add-on-24,Keep,,
+SERPINF1,,New,Collagen biosynthesis,Recessive OI type VI
+SERPING1,Wide-147,Keep,,
+SERPINH1,,New,Collagen biosynthesis,HSP47 collagen chaperone; recessive OI
+SGMS2,Wide-147,Keep,,
+SHOC2,Wide-147,Keep,,
+SKI,Wide-147,Keep,,
+SLC26A2,Wide-147,Keep,,
+SLC26A4,,Negative control,Negative control,Pendred syndrome
+SLC2A10,Wide-147,Keep,,
+SLC39A13,Wide-147,Keep,,
+SMAD2,Wide-147,Keep,,
+SMAD3,Wide-147,Keep,,
+SMAD4,Wide-147,Keep,,
+SMAD6,Wide-147,Keep,,
+SMS,Wide-147,Keep,,
+SP7,Wide-147,Keep,,
+SPARC,Wide-147,Keep,,
+TAB2,Wide-147,Keep,,
+TALDO1,Wide-147,Keep,,
+TBX5,Add-on-24,Proposed removal,,Included only because it lies at a POP GWAS locus; rare coding variants test a different hypothesis from the common GWAS signal
+TGFB1,Wide-147,Keep,,
+TGFB2,Wide-147,Keep,,
+TGFB3,Wide-147,Keep,,
+TGFBR1,Core-10;Wide-147,Keep,,
+TGFBR2,Core-10;Wide-147,Keep,,
+TIMP1,,New,Matrix remodelling,MMP inhibitor; TIMP2 already included
+TIMP2,Add-on-24,Keep,,
+TIMP3,,New,Matrix remodelling,MMP inhibitor; Sorsby fundus dystrophy
+TLN1,Wide-147,Keep,,
+TMEM38B,,New,Collagen biosynthesis,Recessive OI
+TNFRSF1A,Wide-147,Keep,,
+TNXB,Core-10;Wide-147,Keep,,
+UPF3B,Wide-147,Keep,,
+VCAN,Wide-147,Keep,,
+VCL,Add-on-24,Keep,,
+WNT1,Wide-147,Keep,,
+WNT4,Add-on-24,Keep,,
+WT1,Add-on-24,Keep,,
+ZDHHC9,Wide-147,Keep,,
+ZNF469,Wide-147,Keep,,
