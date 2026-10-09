@@ -1,6 +1,6 @@
 # %% CELL 10 - thesis results tables for the variant analysis
-# Reads the saved results files, so it does not need CELLS 3-6 rerun and is light enough to run
-# while the PRS job is going. Prints a shareable version (counts 1-19 suppressed) that can be copied out.
+# Reads the saved results files, so it does not need CELLS 3-6 rerun
+#  Prints a shareable version (counts 1-19 suppressed) that can be copied out.
 import os, subprocess, numpy as np, pandas as pd
 
 OUT = "gs://vpa-full-YOUR-WORKSPACE-ID/vpa_rerun"
