@@ -12,6 +12,9 @@ describe_all <- function(combined, exposure, covariate_model = FALSE) {
   pct  <- function(k, n) ifelse(k > 0 & k < 20, "-", sprintf("%.1f", 100 * k / n))
 
   # ---- same exclusions, smoking and race/ethnicity coding as run_all ----
+  # there are lots of "your-workspace-id"s here -- they were used to call up different ids for different cohorts
+  # i.e., one was the control cohort, OI cohort etc - they have the data project (CDR) in AoU (something silly usually)
+  # then the specification - so like gs://controls-wb-silky-bagel-3498 or something equally strange
   get_ids <- function(bucket) {
     files <- system2("gsutil", c("ls", paste0(bucket, "/**")), stdout = TRUE, stderr = TRUE)
     f <- grep("person[^/]*\\.csv(\\.gz)?$", files, value = TRUE)
@@ -21,9 +24,9 @@ describe_all <- function(combined, exposure, covariate_model = FALSE) {
       read_csv(tmp, col_select = "person_id", show_col_types = FALSE)$person_id
     }))))
   }
-  exclude <- union(get_ids("gs://hypermobility-syndrome-YOUR-WORKSPACE-ID"),
-                   get_ids("gs://oi-YOUR-WORKSPACE-ID"))
-  system2("gsutil", c("cp", "gs://rerun-controls-YOUR-WORKSPACE-ID/control_smoking.rds", "/tmp/"),
+  exclude <- union(get_ids("gs://YOUR-WORKSPACE-ID"),
+                   get_ids("gs://YOUR-WORKSPACE-ID"))
+  system2("gsutil", c("cp", "gs://YOUR-WORKSPACE-ID/control_smoking.rds", "/tmp/"),
           stdout = TRUE, stderr = TRUE)
   case_smoking <- surveyOccurrence_df %>%
     filter(question == 1585857 | question == "1585857") %>%
