@@ -1,18 +1,18 @@
 # =====================================================================
 # All of Us (Aim 1): build the analysis dataset for one cohort
 #
-# Run in each cohort's notebook (controls, EDS, Marfan) BELOW the cells the
-# Dataset Builder generates. Those cells load person_df, conditionOccurrence_df,
-# bmi_df, zipcodeSocioeconomic_df and surveyOccurrence_df; they are generated per
-# workspace and are not included here (concept sets: Supplementary Table S2).
+# Run in each cohort's notebook (controls, EDS, Marfan, OI etc etc) - Have to load the person 
+# information first (i.e, person_sql etc) - this is to load in the cohorts information, it will not run otherwise. 
+# i.e., run all of this code BELOW the cells the
+# Dataset Builder generates. 
 #
 # Set this_cohort below, run the notebook, and the dataset is saved to that
 # cohort's workspace bucket. Intermediate files go to /tmp, never the notebook folder.
 # =====================================================================
 library(tidyverse)
 
-this_cohort <- "eds_case"      # "control" in the controls notebook; "marfan_case" for Marfan
-bucket      <- "gs://rerun-eds-YOUR-WORKSPACE-ID"    # this cohort's bucket (controls: gs://rerun-controls-YOUR-WORKSPACE-ID)
+this_cohort <- "whatever_case"      # "control" in the controls notebook; "marfan_case" for Marfan
+bucket      <- "gs://YOUR-WORKSPACE-ID"    # this cohort's bucket (controls: gs://rerun-controls-YOUR-WORKSPACE-ID)
 
 # ---- 1. classify each condition record as POP, menopause or neither ----
 # POP: ICD-10-CM N81.x or N99.3, ICD-9-CM 618.x, or SNOMED genital prolapse concepts;
