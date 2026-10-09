@@ -3,10 +3,10 @@
 #
 # The Marfan estimate rests on few POP events, so this checks how much it depends
 # on which controls were selected. For each case, 4 controls are drawn at random from
-# every control within the caliper; the conditional logistic model is refitted, and
+# every control within the caliper; logistic model is then refitted, and
 # this is repeated 500 times. Run in the Marfan notebook after
 # 01_build_analysis_dataset.R (needs match_data built from marfan_combined).
-# Output is a summary of the OR distribution only (no counts): safe to export.
+# Output is a summary of the OR distribution only (no counts) due to AoU data privacy
 # =====================================================================
 library(tidyverse); library(survival)
 
