@@ -2,7 +2,7 @@ library(tidyverse); library(survival); library(MatchIt); library(broom)
 
 run_all <- function(combined, exposure) {
 
-  # ---- 1. remove hypermobility + OI women from the controls ----
+  # ---- 1. remove hypermobility + OI or whatever extra people from the controls ----
   get_ids <- function(bucket) {
     files <- system2("gsutil", c("ls", paste0(bucket, "/**")), stdout = TRUE, stderr = TRUE)
     f <- grep("person[^/]*\\.csv(\\.gz)?$", files, value = TRUE)
@@ -16,7 +16,7 @@ run_all <- function(combined, exposure) {
                    get_ids("gs://oi-YOUR-WORKSPACE-ID"))
 
   # ---- 2. smoking (cases from this notebook, controls from saved file) ----
-  system2("gsutil", c("cp", "gs://rerun-controls-YOUR-WORKSPACE-ID/control_smoking.rds", "/tmp/"),
+  system2("gsutil", c("cp", "gs://YOUR-WORKSPACE-ID/controls_smoking.rds", "/tmp/"),
           stdout = TRUE, stderr = TRUE)
   case_smoking <- surveyOccurrence_df %>%
     filter(question == 1585857 | question == "1585857") %>%
@@ -100,7 +100,7 @@ run_all <- function(combined, exposure) {
 }
 
 # ---- change this last line per notebook ----
-run_all(eds_combined, "EDS")
+run_all(cases_combined, "cases")
 # run_all(marfan_combined, "Marfan")
 # run_all(hyp_combined, "Hypermobility")
 # run_all(bind_rows(control_df %>% filter(!person_id %in% cases_df$person_id) %>% mutate(cohort = "control"), cases_df), "OI")
