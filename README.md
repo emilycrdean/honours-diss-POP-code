@@ -81,12 +81,6 @@ Each `# %%` block is one cell.
 - `prs_gw_diagnose.py` (PRS-G5) is a quality-control check. It compares the score's weights with the published odds ratios at the lead SNPs. The weights were oriented opposite to the published effects at every lead SNP, so the score sign was reversed before analysis.
 - `pujol_gualdo_30_lead_variants.csv` holds the published lead variants (public summary statistics).
 
-### 05_figures_tables
-
-- `thesis_theme.R`: shared colours, theme and plotting helpers.
-- `aim1_figures.R`, `flow_diagrams.R`, `pva_results_figures.R` and `aou_or_bars.R`: figures, drawn from aggregate results only.
-
-
 
 Workspace-specific identifiers have been replaced with placeholders. Before running, replace these with your own workspace's values:
 
